@@ -1,17 +1,21 @@
-from flask import Flask
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# 1. Ruta Principal: Presentación del Negocio
 @app.route('/')
 def home():
-    return "<h1>Bienvenido a Delivery Puyo</h1><p>Tu comida favorita, directo a la puerta de tu casa en Puyo.</p>"
+    # Renderiza el archivo index.html
+    return render_template('index.html')
 
-# 2. Ruta Dinámica: Consulta de Pedidos
-# Adaptado a: /pedido/<id_pedido>
+@app.route('/nosotros')
+def nosotros():
+    # Renderiza el archivo nosotros.html
+    return render_template('nosotros.html')
+
 @app.route('/pedido/<int:id_pedido>')
 def consultar_pedido(id_pedido):
-    return f"<h3>Estado del Pedido #{id_pedido}</h3><p>Estimado cliente, su pedido de Delivery Puyo está en camino.</p>"
+    # Aquí puedes pasar variables a la plantilla
+    return render_template('index.html', pedido_id=id_pedido)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Puyo - App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">Inicio</a> | 
+        <a href="/nosotros">Sobre Nosotros</a> |
+        <a href="/pedido/1">Ver un Pedido</a>
+    </nav>
+    <hr>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <hr>
+    <footer>
+        <p>&copy; 2026 Delivery Puyo - Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
