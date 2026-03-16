@@ -1,41 +1,28 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
+{% block title %}Usuarios{% endblock %}
 
 {% block content %}
-<h2>Gestión de Usuarios - Delivery Puyo</h2>
+<section>
+    <h2>Usuarios registrados</h2>
 
-<div style="background: #f9f9f9; padding: 15px; border-radius: 5px;">
-    <form action="/agregar_usuario" method="POST">
-        <input type="text" name="nombre" placeholder="Nombre completo" required>
-        <input type="email" name="mail" placeholder="Correo electrónico" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit" style="background: #28a745; color: white; border: none; padding: 8px;">Registrar Usuario</button>
-    </form>
-</div>
-
-<hr>
-
-<table border="1" style="width: 100%; border-collapse: collapse; text-align: left;">
-    <thead style="background: #eee;">
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in usuarios %}
-        <tr>
-            <td>{{ user[0] }}</td>
-            <td>{{ user[1] }}</td>
-            <td>{{ user[2] }}</td>
-            <td>
-                <a href="/eliminar_usuario/{{ user[0] }}" style="color: red;">Eliminar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<p><a href="/">Volver al Inicio</a></p>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in usuarios %}
+            <tr>
+                <td>{{ u.id_usuario }}</td>
+                <td>{{ u.nombre }}</td>
+                <td>{{ u.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
 {% endblock %}

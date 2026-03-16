@@ -2,24 +2,54 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Delivery Puyo - App</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DeliverPuyo{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav>
-        <a href="/">Inicio</a> | 
-        <a href="/nosotros">Sobre Nosotros</a> |
-        <a href="/pedido/1">Ver un Pedido</a>
-    </nav>
-    <hr>
+    <header class="site-header">
+        <div class="container">
+            <div class="brand">
+                <h1>DeliverPuyo</h1>
+                <p>Plataforma de pedidos y entregas en Puyo</p>
+            </div>
 
-    <main>
-        {% block content %}{% endblock %}
+            <nav class="navbar">
+                <a href="{{ url_for('index') }}">Inicio</a>
+                <a href="{{ url_for('nosotros') }}">Nosotros</a>
+
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('productos') }}">Productos</a>
+                    <a href="{{ url_for('usuarios') }}">Usuarios</a>
+                    <a href="{{ url_for('datos') }}">Persistencia</a>
+                    <a href="{{ url_for('logout') }}">Cerrar sesión</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Registro</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <hr>
-    <footer>
-        <p>&copy; 2026 Delivery Puyo - Todos los derechos reservados.</p>
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 DeliverPuyo - Proyecto Flask</p>
+        </div>
     </footer>
 </body>
 </html>
