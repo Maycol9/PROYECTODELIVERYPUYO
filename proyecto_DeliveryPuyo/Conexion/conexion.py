@@ -1,6 +1,7 @@
 import os
 import mysql.connector
 
+
 def get_connection():
     return mysql.connector.connect(
         host=os.getenv("MYSQL_HOST", "127.0.0.1"),

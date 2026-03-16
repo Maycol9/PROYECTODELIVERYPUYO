@@ -2,7 +2,6 @@ import os
 import sqlite3
 from inventario.productos import Producto
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_FILE = os.path.join(BASE_DIR, "delivery_puyo.db")
 

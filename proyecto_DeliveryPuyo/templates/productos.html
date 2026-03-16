@@ -29,9 +29,9 @@
                 <td>${{ "%.2f"|format(p.precio) }}</td>
                 <td>{{ p.stock }}</td>
                 <td>
-                    <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}">Editar</a>
-                    |
-                    <a href="{{ url_for('eliminar_producto', id_producto=p.id_producto) }}" onclick="return confirm('¿Eliminar producto?')">Eliminar</a>
+                    <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}">Editar</a> |
+                    <a href="{{ url_for('eliminar_producto', id_producto=p.id_producto) }}"
+                       onclick="return confirm('¿Eliminar producto?')">Eliminar</a>
                 </td>
             </tr>
             {% endfor %}
