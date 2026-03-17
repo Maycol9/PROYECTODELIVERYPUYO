@@ -1,24 +1,190 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio{% endblock %}
+{% block title %}Inicio | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section>
-    <h2>Bienvenido a DeliverPuyo</h2>
-    <p>Sistema web de delivery desarrollado con Flask, MySQL, SQLite y persistencia en archivos.</p>
+<section class="hero-section">
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <span class="hero-badge">PROYECTO WEB DESARROLLADO EN FLASK</span>
+            <h1>DeliverPuyo: gestión moderna de productos, usuarios e inventario</h1>
+            <p>
+                DeliverPuyo es una plataforma web orientada a la administración de catálogo,
+                control de inventario y gestión de acceso de usuarios, diseñada con una
+                interfaz moderna, profesional y funcional para optimizar la operación del sistema.
+            </p>
 
-    <div class="card">
-        <h3>Objetivo del sistema</h3>
-        <p>
-            DeliverPuyo permite gestionar usuarios, productos, autenticación,
-            inventario y múltiples formas de persistencia de datos.
-        </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('productos') }}" class="btn btn-dark">Ver catálogo</a>
+
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-green">Administrar sistema</a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-green">Crear cuenta</a>
+                {% endif %}
+            </div>
+
+            <div class="hero-points">
+                <div class="hero-point">
+                    <span class="point-icon">●</span>
+                    <span>Autenticación de usuarios con acceso controlado</span>
+                </div>
+                <div class="hero-point">
+                    <span class="point-icon">●</span>
+                    <span>Gestión de productos e inventario desde una sola plataforma</span>
+                </div>
+                <div class="hero-point">
+                    <span class="point-icon">●</span>
+                    <span>Diseño profesional desarrollado para el proyecto DeliverPuyo</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-card hero-card-main">
+                <div class="hero-card-top">
+                    <span class="mini-pill">Módulos principales</span>
+                    <strong>Usuarios · Productos · Inventario</strong>
+                </div>
+
+                <h3>Panel integral de administración</h3>
+                <p>
+                    El sistema centraliza la gestión de productos, consulta del catálogo,
+                    acceso seguro de usuarios y control de información en una interfaz
+                    organizada y moderna.
+                </p>
+
+                <div class="search-mock">
+                    <span class="search-icon">⌕</span>
+                    <span>Buscar productos, categorías o registros del sistema</span>
+                </div>
+
+                <div class="chips">
+                    <span class="chip">Catálogo</span>
+                    <span class="chip">Inventario</span>
+                    <span class="chip">Usuarios</span>
+                    <span class="chip">Dashboard</span>
+                </div>
+            </div>
+
+            <div class="hero-mini-stats">
+                <div class="mini-stat">
+                    <strong>Catálogo</strong>
+                    <span>Visualización clara de productos</span>
+                </div>
+                <div class="mini-stat">
+                    <strong>Acceso</strong>
+                    <span>Autenticación y control de usuarios</span>
+                </div>
+                <div class="mini-stat">
+                    <strong>Gestión</strong>
+                    <span>Administración centralizada</span>
+                </div>
+            </div>
+        </div>
     </div>
+</section>
 
-    <h3>Rutas dinámicas de ejemplo</h3>
-    <ul>
-        <li><a href="/cliente/Maycol">Cliente dinámico</a></li>
-        <li><a href="/zona/Centro">Zona dinámica</a></li>
-    </ul>
+<section class="section section-soft">
+    <div class="container">
+        <div class="section-heading">
+            <span class="section-kicker">FUNCIONALIDADES DEL PROYECTO</span>
+            <h2>Una aplicación pensada para organizar y administrar el sistema</h2>
+            <p>
+                DeliverPuyo no solo presenta información visualmente atractiva, sino que integra
+                módulos reales para autenticar usuarios, administrar productos y mantener el control del inventario.
+            </p>
+        </div>
+
+        <div class="feature-grid">
+            <article class="feature-card">
+                <div class="feature-icon">01</div>
+                <h3>Autenticación segura</h3>
+                <p>
+                    El sistema incorpora control de acceso para registrar usuarios,
+                    iniciar sesión y proteger la administración interna de la plataforma.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">02</div>
+                <h3>Gestión de productos</h3>
+                <p>
+                    Permite registrar, consultar y organizar productos dentro del catálogo,
+                    facilitando la administración de la información del sistema.
+                </p>
+            </article>
+
+            <article class="feature-card">
+                <div class="feature-icon">03</div>
+                <h3>Control de inventario</h3>
+                <p>
+                    La plataforma está orientada al seguimiento de existencias y al manejo
+                    ordenado de datos para una mejor operación del proyecto.
+                </p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="section-heading">
+            <span class="section-kicker">ESTRUCTURA DEL SISTEMA</span>
+            <h2>Cómo funciona DeliverPuyo</h2>
+        </div>
+
+        <div class="steps-grid">
+            <div class="step-card">
+                <span class="step-number">1</span>
+                <h3>Acceso al sistema</h3>
+                <p>
+                    El usuario puede registrarse e iniciar sesión para ingresar
+                    a la plataforma y acceder a las funciones correspondientes.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">2</span>
+                <h3>Administración de datos</h3>
+                <p>
+                    Una vez autenticado, el sistema permite gestionar productos,
+                    consultar información y mantener el orden del inventario.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <span class="step-number">3</span>
+                <h3>Control desde el dashboard</h3>
+                <p>
+                    El panel principal concentra el acceso a los módulos del proyecto,
+                    facilitando una administración más clara y profesional.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <div class="cta-banner">
+            <div>
+                <span class="section-kicker">DELIVERPUYO</span>
+                <h2>Una plataforma web con identidad propia y enfoque profesional</h2>
+                <p>
+                    Esta plataforma integra un diseño moderno, autenticación, gestión de productos
+                    e inventario en una solución web funcional desarrollada para demostrar
+                    organización, estructura y calidad en la implementación.
+                </p>
+            </div>
+
+            <div class="cta-actions">
+                <a href="{{ url_for('productos') }}" class="btn btn-dark">Explorar módulos</a>
+                {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('login') }}" class="btn btn-outline">Acceder al sistema</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </section>
 {% endblock %}

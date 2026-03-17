@@ -1,10 +1,74 @@
 {% extends 'base.html' %}
 
-{% block title %}Nosotros{% endblock %}
+{% block title %}Nosotros | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section>
-    <h2>Nosotros</h2>
-    <p>DeliverPuyo es una plataforma académica para gestión de pedidos, usuarios e inventario en Puyo.</p>
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <span class="section-kicker">SOBRE EL PROYECTO</span>
+            <h1>¿Qué es DeliverPuyo?</h1>
+            <p>
+                DeliverPuyo es una aplicación web académica desarrollada para la gestión
+                de usuarios, productos e inventario, con una interfaz moderna y una estructura organizada.
+            </p>
+        </div>
+
+        <div class="content-grid">
+            <article class="info-card">
+                <h2>Propósito del sistema</h2>
+                <p>
+                    El proyecto nace con la finalidad de construir una solución web funcional
+                    capaz de administrar el catálogo de productos, el acceso de usuarios y el control
+                    de información de manera clara, segura y profesional.
+                </p>
+
+                <ul class="checklist">
+                    <li>Gestión centralizada de productos</li>
+                    <li>Autenticación y control de acceso</li>
+                    <li>Visualización clara de inventario</li>
+                    <li>Interfaz adaptada a una experiencia moderna</li>
+                </ul>
+            </article>
+
+            <article class="info-card">
+                <h2>Tecnologías utilizadas</h2>
+                <div class="tech-grid">
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">Flask</span>
+                    <span class="tech-item">Jinja2</span>
+                    <span class="tech-item">Flask-Login</span>
+                    <span class="tech-item">SQLite</span>
+                    <span class="tech-item">MySQL</span>
+                    <span class="tech-item">HTML</span>
+                    <span class="tech-item">CSS</span>
+                </div>
+
+                <p class="muted-text">
+                    La arquitectura del sistema está pensada para combinar backend,
+                    persistencia de datos y diseño frontend dentro de un mismo proyecto.
+                </p>
+            </article>
+        </div>
+
+        <div class="content-grid mt-24">
+            <article class="info-card">
+                <h2>Alcance funcional</h2>
+                <p>
+                    DeliverPuyo integra componentes clave para el desarrollo de una aplicación web:
+                    autenticación, administración de productos, control de inventario, panel principal
+                    y organización de la información del sistema.
+                </p>
+            </article>
+
+            <article class="info-card">
+                <h2>Valor del proyecto</h2>
+                <p>
+                    Más que una página visualmente atractiva, DeliverPuyo representa una implementación
+                    práctica de conceptos de desarrollo web, estructura de datos, persistencia y experiencia de usuario.
+                </p>
+            </article>
+        </div>
+    </div>
 </section>
 {% endblock %}

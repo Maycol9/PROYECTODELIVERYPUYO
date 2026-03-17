@@ -1,13 +1,60 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Dashboard | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section>
-    <h2>Dashboard</h2>
-    <p>Bienvenido, {{ usuario.nombre }}.</p>
-    <div class="card">
-        <p>Desde aquí puedes administrar productos, usuarios y persistencia de DeliverPuyo.</p>
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <span class="section-kicker">PANEL PRINCIPAL</span>
+            <h1>Dashboard de administración</h1>
+            <p>
+                Bienvenido al panel principal de DeliverPuyo. Desde aquí puedes acceder
+                a los módulos más importantes del sistema.
+            </p>
+        </div>
+
+        <div class="stats-grid">
+            <article class="stat-card">
+                <h3>Estado del acceso</h3>
+                <strong>Activo</strong>
+                <p>Sesión iniciada correctamente en la plataforma.</p>
+            </article>
+
+            <article class="stat-card">
+                <h3>Productos visibles</h3>
+                <strong>{{ productos|default([])|length }}</strong>
+                <p>Total de productos disponibles en el listado actual.</p>
+            </article>
+
+            <article class="stat-card">
+                <h3>Módulo actual</h3>
+                <strong>Dashboard</strong>
+                <p>Centro de navegación y control del sistema.</p>
+            </article>
+        </div>
+
+        <div class="quick-grid">
+            <a href="{{ url_for('productos') }}" class="quick-card">
+                <h3>Productos</h3>
+                <p>Consulta el catálogo y visualiza los registros existentes.</p>
+            </a>
+
+            <a href="{{ url_for('nuevo_producto') }}" class="quick-card">
+                <h3>Nuevo producto</h3>
+                <p>Agrega un nuevo elemento al catálogo de DeliverPuyo.</p>
+            </a>
+
+            <a href="{{ url_for('nosotros') }}" class="quick-card">
+                <h3>Proyecto</h3>
+                <p>Revisa el propósito, alcance y enfoque técnico del sistema.</p>
+            </a>
+
+            <a href="{{ url_for('index') }}" class="quick-card">
+                <h3>Inicio</h3>
+                <p>Regresa a la página principal y revisa la presentación general.</p>
+            </a>
+        </div>
     </div>
 </section>
 {% endblock %}

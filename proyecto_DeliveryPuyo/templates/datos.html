@@ -1,103 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}Persistencia{% endblock %}
+{% block title %}Datos | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section>
-    <h2>Persistencia TXT</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in datos_txt %}
-            <tr>
-                <td>{{ item.id_producto }}</td>
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.categoria }}</td>
-                <td>{{ item.precio }}</td>
-                <td>{{ item.stock }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<section class="page-section">
+    <div class="container">
+        <div class="page-header">
+            <span class="section-kicker">REGISTROS DEL SISTEMA</span>
+            <h1>Consulta de datos</h1>
+            <p>
+                Esta sección permite visualizar registros almacenados dentro del proyecto.
+            </p>
+        </div>
 
-    <h2>Persistencia JSON</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in datos_json %}
-            <tr>
-                <td>{{ item.id_producto }}</td>
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.categoria }}</td>
-                <td>{{ item.precio }}</td>
-                <td>{{ item.stock }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% if registros is defined %}
+            {% set lista_datos = registros %}
+        {% elif datos is defined %}
+            {% set lista_datos = datos %}
+        {% else %}
+            {% set lista_datos = [] %}
+        {% endif %}
 
-    <h2>Persistencia CSV</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in datos_csv %}
-            <tr>
-                <td>{{ item.id_producto }}</td>
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.categoria }}</td>
-                <td>{{ item.precio }}</td>
-                <td>{{ item.stock }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h2>Persistencia SQLite</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>MySQL ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in datos_sqlite %}
-            <tr>
-                <td>{{ item.mysql_id }}</td>
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.categoria }}</td>
-                <td>{{ item.precio }}</td>
-                <td>{{ item.stock }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% if lista_datos %}
+        <div class="table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Detalle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in lista_datos %}
+                    <tr>
+                        <td>{{ item.id or loop.index }}</td>
+                        <td>{{ item.nombre or item.titulo or item.categoria or 'Registro' }}</td>
+                        <td>{{ item.descripcion or item.detalle or item.valor or 'Sin detalle disponible' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No existen datos para mostrar</h3>
+            <p>Cuando el sistema cargue registros, aparecerán aquí de forma organizada.</p>
+        </div>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}

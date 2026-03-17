@@ -4,27 +4,32 @@ from conexion.conexion import get_connection
 
 class Usuario(UserMixin):
     def __init__(self, id_usuario, nombre, email, password):
-        self.id = str(id_usuario)
         self.id_usuario = id_usuario
         self.nombre = nombre
         self.email = email
         self.password = password
 
+    def get_id(self):
+        return str(self.id_usuario)
+
     @staticmethod
     def obtener_por_id(id_usuario):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE id_usuario = %s", (id_usuario,))
-        fila = cursor.fetchone()
+        cursor.execute(
+            "SELECT id_usuario, nombre, email, password FROM usuarios WHERE id_usuario = %s",
+            (id_usuario,)
+        )
+        row = cursor.fetchone()
         cursor.close()
         conn.close()
 
-        if fila:
+        if row:
             return Usuario(
-                fila["id_usuario"],
-                fila["nombre"],
-                fila["email"],
-                fila["password"]
+                row["id_usuario"],
+                row["nombre"],
+                row["email"],
+                row["password"]
             )
         return None
 
@@ -32,16 +37,19 @@ class Usuario(UserMixin):
     def obtener_por_email(email):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
-        fila = cursor.fetchone()
+        cursor.execute(
+            "SELECT id_usuario, nombre, email, password FROM usuarios WHERE email = %s",
+            (email,)
+        )
+        row = cursor.fetchone()
         cursor.close()
         conn.close()
 
-        if fila:
+        if row:
             return Usuario(
-                fila["id_usuario"],
-                fila["nombre"],
-                fila["email"],
-                fila["password"]
+                row["id_usuario"],
+                row["nombre"],
+                row["email"],
+                row["password"]
             )
         return None

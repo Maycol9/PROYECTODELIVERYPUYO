@@ -1,21 +1,58 @@
 {% extends 'base.html' %}
 
-{% block title %}Registro{% endblock %}
+{% block title %}Registro | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section class="form-box">
-    <h2>Registro de usuario</h2>
-    <form method="POST">
-        <label>Nombre</label>
-        <input type="text" name="nombre" required>
+<section class="page-section">
+    <div class="container auth-grid">
+        <div class="form-box">
+            <h1>Crear cuenta</h1>
+            <p class="form-subtitle">
+                Registra un nuevo usuario para acceder a las funciones de DeliverPuyo.
+            </p>
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ingresa tu nombre completo" required>
+                </div>
 
-        <label>Contraseña</label>
-        <input type="password" name="password" required>
+                <div class="form-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" name="username" class="form-control" placeholder="Elige un nombre de usuario" required>
+                </div>
 
-        <button type="submit">Registrarse</button>
-    </form>
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Ingresa tu correo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Crea una contraseña segura" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-green">Registrar usuario</button>
+                    <a href="{{ url_for('login') }}" class="btn btn-light">Ya tengo cuenta</a>
+                </div>
+            </form>
+        </div>
+
+        <aside class="auth-side">
+            <span class="section-kicker">NUEVO ACCESO</span>
+            <h2>Incorpora usuarios a la plataforma de forma ordenada</h2>
+            <p>
+                El registro permite crear nuevas credenciales para acceder a la
+                administración del sistema y mantener un flujo organizado de trabajo.
+            </p>
+
+            <ul class="auth-side-list">
+                <li>Creación de cuentas de acceso</li>
+                <li>Interfaz clara y profesional</li>
+                <li>Integración con el sistema de autenticación</li>
+            </ul>
+        </aside>
+    </div>
 </section>
 {% endblock %}

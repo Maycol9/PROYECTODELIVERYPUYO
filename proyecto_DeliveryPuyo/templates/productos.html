@@ -1,41 +1,65 @@
 {% extends 'base.html' %}
 
-{% block title %}Productos{% endblock %}
+{% block title %}Productos | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section>
-    <div class="top-bar">
-        <h2>Gestión de productos</h2>
-        <a class="btn" href="{{ url_for('nuevo_producto') }}">Nuevo producto</a>
-    </div>
+<section class="page-section">
+    <div class="container">
+        <div class="page-header page-header-inline">
+            <div>
+                <span class="section-kicker">CATÁLOGO DEL SISTEMA</span>
+                <h1>Gestión de productos</h1>
+                <p>
+                    Consulta y administra los productos registrados dentro de DeliverPuyo.
+                </p>
+            </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in productos %}
-            <tr>
-                <td>{{ p.id_producto }}</td>
-                <td>{{ p.nombre }}</td>
-                <td>{{ p.categoria }}</td>
-                <td>${{ "%.2f"|format(p.precio) }}</td>
-                <td>{{ p.stock }}</td>
-                <td>
-                    <a href="{{ url_for('editar_producto', id_producto=p.id_producto) }}">Editar</a> |
-                    <a href="{{ url_for('eliminar_producto', id_producto=p.id_producto) }}"
-                       onclick="return confirm('¿Eliminar producto?')">Eliminar</a>
-                </td>
-            </tr>
+            {% if current_user.is_authenticated %}
+            <div class="section-actions">
+                <a href="{{ url_for('nuevo_producto') }}" class="btn btn-green">Nuevo producto</a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if productos %}
+        <div class="grid">
+            {% for producto in productos %}
+            <article class="card">
+                {% if producto.imagen %}
+                    <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
+                {% else %}
+                    <div class="card-image-placeholder">Producto</div>
+                {% endif %}
+
+                <div class="card-body">
+                    <div class="card-topline">
+                        <span class="badge">{{ producto.categoria or 'Sin categoría' }}</span>
+                        <span class="stock-badge">Stock: {{ producto.stock }}</span>
+                    </div>
+
+                    <h3 class="card-title">{{ producto.nombre }}</h3>
+                    <p class="card-text">
+                        Producto registrado dentro del catálogo del sistema DeliverPuyo.
+                    </p>
+
+                    <div class="card-footer">
+                        <span class="price">$ {{ producto.precio }}</span>
+                    </div>
+                </div>
+            </article>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No hay productos registrados</h3>
+            <p>Aún no existen productos en el catálogo. Agrega el primero para comenzar.</p>
+            {% if current_user.is_authenticated %}
+                <div class="form-actions center-actions">
+                    <a href="{{ url_for('nuevo_producto') }}" class="btn btn-green">Agregar producto</a>
+                </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </section>
 {% endblock %}
