@@ -3,72 +3,31 @@
 {% block title %}Nosotros | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section class="page-section">
-    <div class="container">
-        <div class="page-header">
-            <span class="section-kicker">SOBRE EL PROYECTO</span>
-            <h1>¿Qué es DeliverPuyo?</h1>
-            <p>
-                DeliverPuyo es una aplicación web académica desarrollada para la gestión
-                de usuarios, productos e inventario, con una interfaz moderna y una estructura organizada.
-            </p>
-        </div>
+<div class="bg-white rounded-4 p-5 shadow-sm">
+    <h2 class="mb-4">Sobre DeliverPuyo</h2>
 
-        <div class="content-grid">
-            <article class="info-card">
-                <h2>Propósito del sistema</h2>
-                <p>
-                    El proyecto nace con la finalidad de construir una solución web funcional
-                    capaz de administrar el catálogo de productos, el acceso de usuarios y el control
-                    de información de manera clara, segura y profesional.
-                </p>
+    <p>
+        DeliverPuyo nace como una propuesta digital orientada a fortalecer la gestión
+        de un servicio de delivery local, ofreciendo una plataforma web que permite
+        organizar de forma eficiente productos, usuarios y respaldos de información
+        dentro de un mismo entorno.
+    </p>
 
-                <ul class="checklist">
-                    <li>Gestión centralizada de productos</li>
-                    <li>Autenticación y control de acceso</li>
-                    <li>Visualización clara de inventario</li>
-                    <li>Interfaz adaptada a una experiencia moderna</li>
-                </ul>
-            </article>
+    <p>
+        Su propósito es facilitar el control administrativo y operativo del sistema,
+        brindando una herramienta confiable para mantener actualizada la información
+        del negocio y optimizar los procesos internos.
+    </p>
 
-            <article class="info-card">
-                <h2>Tecnologías utilizadas</h2>
-                <div class="tech-grid">
-                    <span class="tech-item">Python</span>
-                    <span class="tech-item">Flask</span>
-                    <span class="tech-item">Jinja2</span>
-                    <span class="tech-item">Flask-Login</span>
-                    <span class="tech-item">SQLite</span>
-                    <span class="tech-item">MySQL</span>
-                    <span class="tech-item">HTML</span>
-                    <span class="tech-item">CSS</span>
-                </div>
+    <p>
+        A través de una interfaz moderna, clara y segura, la plataforma permite mantener
+        un mejor control del catálogo de productos, gestionar accesos de usuarios
+        autorizados y disponer de mecanismos de respaldo que fortalecen la integridad
+        y disponibilidad de los datos.
+    </p>
 
-                <p class="muted-text">
-                    La arquitectura del sistema está pensada para combinar backend,
-                    persistencia de datos y diseño frontend dentro de un mismo proyecto.
-                </p>
-            </article>
-        </div>
-
-        <div class="content-grid mt-24">
-            <article class="info-card">
-                <h2>Alcance funcional</h2>
-                <p>
-                    DeliverPuyo integra componentes clave para el desarrollo de una aplicación web:
-                    autenticación, administración de productos, control de inventario, panel principal
-                    y organización de la información del sistema.
-                </p>
-            </article>
-
-            <article class="info-card">
-                <h2>Valor del proyecto</h2>
-                <p>
-                    Más que una página visualmente atractiva, DeliverPuyo representa una implementación
-                    práctica de conceptos de desarrollo web, estructura de datos, persistencia y experiencia de usuario.
-                </p>
-            </article>
-        </div>
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn btn-dark">Volver al inicio</a>
     </div>
-</section>
+</div>
 {% endblock %}

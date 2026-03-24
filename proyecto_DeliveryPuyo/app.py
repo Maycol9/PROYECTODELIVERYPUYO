@@ -1,15 +1,40 @@
 import os
-import json
-import csv
-
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from conexion.conexion import get_connection
-from models import Usuario
-from database import db, ProductoSQLite
+from database import db
+from models.usuario import Usuario
+from models.producto import Producto
 
+from forms.login_form import LoginForm
+from forms.registro_form import RegistroForm
+from forms.producto_form import ProductoForm
+
+from services.usuario_service import (
+    obtener_usuario_por_id,
+    obtener_usuario_por_email,
+    registrar_usuario,
+    obtener_usuarios
+)
+
+from services.producto_service import (
+    obtener_productos,
+    obtener_producto_por_id,
+    insertar_producto,
+    actualizar_producto,
+    eliminar_producto
+)
+
+from services.reporte_service import generar_pdf_productos
+from services.persistencia_service import (
+    init_local_files,
+    sincronizar_persistencia,
+    leer_txt,
+    leer_json,
+    leer_csv,
+    leer_sqlite
+)
 
 app = Flask(
     __name__,
@@ -18,8 +43,8 @@ app = Flask(
     static_url_path="/static"
 )
 
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "deliverpuyo_secret_key")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///delivery_puyo.db"
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "deliverpuyo_secret_key_2026")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(app.root_path, 'delivery_puyo.db')}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -27,134 +52,22 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-login_manager.login_message = "Debes iniciar sesión para acceder a esta sección."
-
-
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DATA_DIR = os.path.join(BASE_DIR, "inventario", "data")
-TXT_FILE = os.path.join(DATA_DIR, "datos.txt")
-JSON_FILE = os.path.join(DATA_DIR, "datos.json")
-CSV_FILE = os.path.join(DATA_DIR, "datos.csv")
+login_manager.login_message = "Debes iniciar sesión para acceder al panel de DeliverPuyo."
+login_manager.login_message_category = "warning"
 
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Usuario.obtener_por_id(user_id)
-
-
-def init_local_files():
-    os.makedirs(DATA_DIR, exist_ok=True)
-
-    if not os.path.exists(TXT_FILE):
-        with open(TXT_FILE, "w", encoding="utf-8"):
-            pass
-
-    if not os.path.exists(JSON_FILE):
-        with open(JSON_FILE, "w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent=4)
-
-    if not os.path.exists(CSV_FILE):
-        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(["id_producto", "nombre", "categoria", "precio", "stock"])
-
-
-def obtener_productos_mysql():
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT id_producto, nombre, categoria, precio, stock
-        FROM productos
-        ORDER BY id_producto DESC
-    """)
-    productos = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    for producto in productos:
-        producto["precio"] = float(producto["precio"])
-        producto["stock"] = int(producto["stock"])
-        producto["id_producto"] = int(producto["id_producto"])
-
-    return productos
-
-
-def leer_txt():
-    datos = []
-    if os.path.exists(TXT_FILE):
-        with open(TXT_FILE, "r", encoding="utf-8") as f:
-            for linea in f:
-                linea = linea.strip()
-                if linea:
-                    partes = linea.split("|")
-                    if len(partes) == 5:
-                        datos.append({
-                            "id_producto": partes[0],
-                            "nombre": partes[1],
-                            "categoria": partes[2],
-                            "precio": partes[3],
-                            "stock": partes[4]
-                        })
-    return datos
-
-
-def leer_json():
-    if os.path.exists(JSON_FILE):
-        with open(JSON_FILE, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-    return []
-
-
-def leer_csv():
-    datos = []
-    if os.path.exists(CSV_FILE):
-        with open(CSV_FILE, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for fila in reader:
-                datos.append(fila)
-    return datos
-
-
-def sincronizar_persistencia():
-    productos = obtener_productos_mysql()
-
-    with open(TXT_FILE, "w", encoding="utf-8") as f:
-        for p in productos:
-            f.write(f"{p['id_producto']}|{p['nombre']}|{p['categoria']}|{p['precio']}|{p['stock']}\n")
-
-    with open(JSON_FILE, "w", encoding="utf-8") as f:
-        json.dump(productos, f, ensure_ascii=False, indent=4)
-
-    with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(
-            f,
-            fieldnames=["id_producto", "nombre", "categoria", "precio", "stock"]
-        )
-        writer.writeheader()
-        writer.writerows(productos)
-
-    ProductoSQLite.query.delete()
-    db.session.commit()
-
-    for p in productos:
-        db.session.add(
-            ProductoSQLite(
-                mysql_id=p["id_producto"],
-                nombre=p["nombre"],
-                categoria=p["categoria"],
-                precio=p["precio"],
-                stock=p["stock"]
-            )
-        )
-    db.session.commit()
+    return obtener_usuario_por_id(user_id)
 
 
 with app.app_context():
     db.create_all()
     init_local_files()
+    try:
+        sincronizar_persistencia(obtener_productos())
+    except Exception as e:
+        print(f"Error al inicializar los respaldos de DeliverPuyo: {e}")
 
 
 @app.route("/")
@@ -169,62 +82,72 @@ def nosotros():
 
 @app.route("/cliente/<nombre>")
 def cliente(nombre):
-    return f"Bienvenido, {nombre}. Tu pedido en DeliverPuyo está en proceso."
+    return f"Hola, {nombre}. Bienvenido a DeliverPuyo. Tu solicitud está siendo procesada correctamente."
 
 
 @app.route("/zona/<sector>")
 def zona(sector):
-    return f"DeliverPuyo realiza entregas en el sector: {sector}."
+    return f"DeliverPuyo mantiene cobertura operativa y gestión de pedidos en el sector: {sector}."
+
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+
     if request.method == "POST":
-        nombre = request.form.get("nombre", "").strip()
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "").strip()
+        form = RegistroForm(request.form)
 
-        if not nombre or not email or not password:
-            flash("Todos los campos son obligatorios.")
-            return redirect(url_for("register"))
+        if form.validar():
+            usuario_existente = obtener_usuario_por_email(form.email)
 
-        if Usuario.obtener_por_email(email):
-            flash("Ese correo ya está registrado.")
-            return redirect(url_for("register"))
+            if usuario_existente:
+                flash("El correo ingresado ya se encuentra registrado en DeliverPuyo.", "danger")
+            else:
+                password_hash = generate_password_hash(form.password)
 
-        password_hash = generate_password_hash(password)
+                nuevo_usuario = Usuario(
+                    nombre=form.nombre,
+                    email=form.email,
+                    password=password_hash
+                )
 
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO usuarios (nombre, email, password) VALUES (%s, %s, %s)",
-            (nombre, email, password_hash)
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        flash("Usuario registrado correctamente. Ahora inicia sesión.")
-        return redirect(url_for("login"))
+                registrar_usuario(nuevo_usuario)
+                flash("Tu cuenta fue creada correctamente. Ahora puedes iniciar sesión en DeliverPuyo.", "success")
+                return redirect(url_for("login"))
+        else:
+            for error in form.errores:
+                flash(error, "danger")
 
     return render_template("register.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+
     if request.method == "POST":
-        email = request.form.get("email", "").strip()
-        password = request.form.get("password", "").strip()
+        form = LoginForm(request.form)
 
-        usuario = Usuario.obtener_por_email(email)
+        if form.validar():
+            usuario = obtener_usuario_por_email(form.email)
 
-        if usuario and check_password_hash(usuario.password, password):
-            login_user(usuario)
-            flash("Inicio de sesión exitoso.")
-            return redirect(url_for("dashboard"))
-
-        flash("Correo o contraseña incorrectos.")
-        return redirect(url_for("login"))
+            if usuario and check_password_hash(usuario.password, form.password):
+                login_user(usuario)
+                flash(f"Bienvenido, {usuario.nombre}. Has ingresado correctamente a DeliverPuyo.", "success")
+                return redirect(url_for("dashboard"))
+            else:
+                flash("No fue posible iniciar sesión. Verifica tu correo y contraseña.", "danger")
+        else:
+            for error in form.errores:
+                flash(error, "danger")
 
     return render_template("login.html")
 
@@ -233,159 +156,128 @@ def login():
 @login_required
 def logout():
     logout_user()
-    flash("Sesión cerrada correctamente.")
+    flash("Has cerrado sesión correctamente en DeliverPuyo.", "info")
     return redirect(url_for("login"))
-
-
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template("dashboard.html", usuario=current_user)
 
 
 @app.route("/usuarios")
 @login_required
 def usuarios():
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT id_usuario, nombre, email FROM usuarios ORDER BY id_usuario DESC")
-    lista_usuarios = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    lista_usuarios = obtener_usuarios()
     return render_template("usuarios.html", usuarios=lista_usuarios)
 
 
 @app.route("/productos")
 @login_required
-def productos():
-    lista_productos = obtener_productos_mysql()
-    return render_template("productos.html", productos=lista_productos)
+def listar_productos():
+    productos = obtener_productos()
+    return render_template("productos/listar.html", productos=productos)
 
 
-@app.route("/productos/nuevo", methods=["GET", "POST"])
+@app.route("/productos/crear", methods=["GET", "POST"])
 @login_required
-def nuevo_producto():
+def crear_producto():
     if request.method == "POST":
-        nombre = request.form.get("nombre", "").strip()
-        categoria = request.form.get("categoria", "").strip()
-        precio = request.form.get("precio", "").strip()
-        stock = request.form.get("stock", "").strip()
+        form = ProductoForm(request.form)
 
-        if not nombre or not categoria or not precio or not stock:
-            flash("Todos los campos del producto son obligatorios.")
-            return redirect(url_for("nuevo_producto"))
+        if form.validar():
+            producto = Producto(
+                nombre=form.nombre,
+                categoria=form.categoria,
+                precio=float(form.precio),
+                stock=int(form.stock)
+            )
 
-        try:
-            precio = float(precio)
-            stock = int(stock)
-        except ValueError:
-            flash("Precio o stock inválidos.")
-            return redirect(url_for("nuevo_producto"))
+            insertar_producto(producto)
+            sincronizar_persistencia(obtener_productos())
 
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO productos (nombre, categoria, precio, stock) VALUES (%s, %s, %s, %s)",
-            (nombre, categoria, precio, stock)
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+            flash("El producto fue registrado correctamente en el catálogo de DeliverPuyo.", "success")
+            return redirect(url_for("listar_productos"))
+        else:
+            for error in form.errores:
+                flash(error, "danger")
 
-        sincronizar_persistencia()
-
-        flash("Producto agregado correctamente.")
-        return redirect(url_for("productos"))
-
-    return render_template("producto_form.html", producto=None)
+    return render_template("productos/crear.html")
 
 
 @app.route("/productos/editar/<int:id_producto>", methods=["GET", "POST"])
 @login_required
 def editar_producto(id_producto):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
+    producto_db = obtener_producto_por_id(id_producto)
+
+    if not producto_db:
+        flash("El producto solicitado no fue encontrado en DeliverPuyo.", "warning")
+        return redirect(url_for("listar_productos"))
 
     if request.method == "POST":
-        nombre = request.form.get("nombre", "").strip()
-        categoria = request.form.get("categoria", "").strip()
-        precio = request.form.get("precio", "").strip()
-        stock = request.form.get("stock", "").strip()
+        form = ProductoForm(request.form)
 
-        if not nombre or not categoria or not precio or not stock:
-            flash("Todos los campos del producto son obligatorios.")
-            cursor.close()
-            conn.close()
-            return redirect(url_for("editar_producto", id_producto=id_producto))
+        if form.validar():
+            producto = Producto(
+                id_producto=id_producto,
+                nombre=form.nombre,
+                categoria=form.categoria,
+                precio=float(form.precio),
+                stock=int(form.stock)
+            )
 
-        try:
-            precio = float(precio)
-            stock = int(stock)
-        except ValueError:
-            flash("Precio o stock inválidos.")
-            cursor.close()
-            conn.close()
-            return redirect(url_for("editar_producto", id_producto=id_producto))
+            actualizar_producto(producto)
+            sincronizar_persistencia(obtener_productos())
 
-        cursor.execute(
-            """
-            UPDATE productos
-            SET nombre = %s, categoria = %s, precio = %s, stock = %s
-            WHERE id_producto = %s
-            """,
-            (nombre, categoria, precio, stock, id_producto)
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
+            flash("La información del producto fue actualizada correctamente.", "success")
+            return redirect(url_for("listar_productos"))
+        else:
+            for error in form.errores:
+                flash(error, "danger")
 
-        sincronizar_persistencia()
-
-        flash("Producto actualizado correctamente.")
-        return redirect(url_for("productos"))
-
-    cursor.execute("SELECT * FROM productos WHERE id_producto = %s", (id_producto,))
-    producto = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if not producto:
-        flash("Producto no encontrado.")
-        return redirect(url_for("productos"))
-
-    return render_template("producto_form.html", producto=producto)
+    return render_template("productos/editar.html", producto=producto_db)
 
 
-@app.route("/productos/eliminar/<int:id_producto>")
+@app.route("/productos/eliminar/<int:id_producto>", methods=["POST"])
 @login_required
-def eliminar_producto(id_producto):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM productos WHERE id_producto = %s", (id_producto,))
-    conn.commit()
-    cursor.close()
-    conn.close()
+def eliminar_producto_route(id_producto):
+    producto_db = obtener_producto_por_id(id_producto)
 
-    sincronizar_persistencia()
+    if not producto_db:
+        flash("No fue posible eliminar el producto porque no existe en el sistema.", "warning")
+    else:
+        eliminar_producto(id_producto)
+        sincronizar_persistencia(obtener_productos())
+        flash("El producto fue eliminado correctamente del catálogo de DeliverPuyo.", "success")
 
-    flash("Producto eliminado correctamente.")
-    return redirect(url_for("productos"))
+    return redirect(url_for("listar_productos"))
+
+
+@app.route("/productos/pdf")
+@login_required
+def reporte_productos_pdf():
+    productos = obtener_productos()
+
+    carpeta_reportes = os.path.join(app.root_path, "static", "reportes")
+    os.makedirs(carpeta_reportes, exist_ok=True)
+
+    ruta_pdf = os.path.join(carpeta_reportes, "reporte_productos.pdf")
+    generar_pdf_productos(productos, ruta_pdf)
+
+    return send_file(
+        ruta_pdf,
+        as_attachment=True,
+        download_name="reporte_productos_deliverpuyo.pdf"
+    )
 
 
 @app.route("/datos")
 @login_required
 def datos():
-    datos_txt = leer_txt()
-    datos_json = leer_json()
-    datos_csv = leer_csv()
-    datos_sqlite = ProductoSQLite.query.order_by(ProductoSQLite.mysql_id.desc()).all()
+    productos = obtener_productos()
+    sincronizar_persistencia(productos)
 
     return render_template(
         "datos.html",
-        datos_txt=datos_txt,
-        datos_json=datos_json,
-        datos_csv=datos_csv,
-        datos_sqlite=datos_sqlite
+        datos_txt=leer_txt(),
+        datos_json=leer_json(),
+        datos_csv=leer_csv(),
+        datos_sqlite=leer_sqlite()
     )
 
 

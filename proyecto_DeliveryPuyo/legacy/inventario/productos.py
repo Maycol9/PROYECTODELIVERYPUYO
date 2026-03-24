@@ -1,8 +1,8 @@
 class Producto:
-    def __init__(self, id_producto, nombre, cantidad, precio, categoria):
+    def __init__(self, id_producto=None, nombre="", stock=0, precio=0.0, categoria=""):
         self.__id_producto = id_producto
         self.__nombre = nombre
-        self.__cantidad = cantidad
+        self.__stock = stock
         self.__precio = precio
         self.__categoria = categoria
 
@@ -12,8 +12,8 @@ class Producto:
     def get_nombre(self):
         return self.__nombre
 
-    def get_cantidad(self):
-        return self.__cantidad
+    def get_stock(self):
+        return self.__stock
 
     def get_precio(self):
         return self.__precio
@@ -21,11 +21,14 @@ class Producto:
     def get_categoria(self):
         return self.__categoria
 
+    def set_id_producto(self, id_producto):
+        self.__id_producto = id_producto
+
     def set_nombre(self, nombre):
         self.__nombre = nombre
 
-    def set_cantidad(self, cantidad):
-        self.__cantidad = cantidad
+    def set_stock(self, stock):
+        self.__stock = stock
 
     def set_precio(self, precio):
         self.__precio = precio
@@ -35,9 +38,9 @@ class Producto:
 
     def to_dict(self):
         return {
-            "id": self.__id_producto,
+            "id_producto": self.__id_producto,
             "nombre": self.__nombre,
-            "cantidad": self.__cantidad,
+            "stock": self.__stock,
             "precio": self.__precio,
             "categoria": self.__categoria
         }
@@ -46,7 +49,7 @@ class Producto:
         return (
             f"ID: {self.__id_producto} | "
             f"Nombre: {self.__nombre} | "
-            f"Cantidad: {self.__cantidad} | "
-            f"Precio: ${self.__precio:.2f} | "
+            f"Stock: {self.__stock} | "
+            f"Precio: ${float(self.__precio):.2f} | "
             f"Categoría: {self.__categoria}"
         )

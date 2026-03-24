@@ -1,60 +1,68 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard | DeliverPuyo{% endblock %}
+{% block title %}Panel principal | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section class="page-section">
-    <div class="container">
-        <div class="page-header">
-            <span class="section-kicker">PANEL PRINCIPAL</span>
-            <h1>Dashboard de administración</h1>
-            <p>
-                Bienvenido al panel principal de DeliverPuyo. Desde aquí puedes acceder
-                a los módulos más importantes del sistema.
-            </p>
+<div class="bg-white rounded-4 p-4 shadow-sm">
+    <h2 class="mb-3">Panel principal</h2>
+    <p class="mb-4">
+        Bienvenido, <strong>{{ current_user.nombre }}</strong>. Desde este panel puedes
+        administrar la información principal de DeliverPuyo, controlar productos,
+        consultar usuarios registrados, revisar respaldos del sistema y generar reportes.
+    </p>
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Gestión de productos</h5>
+                    <p class="card-text">
+                        Administra el catálogo de productos disponibles en la plataforma,
+                        manteniendo actualizada la información de nombre, categoría, precio y stock.
+                    </p>
+                    <a href="{{ url_for('listar_productos') }}" class="btn btn-dark">Ir a productos</a>
+                </div>
+            </div>
         </div>
 
-        <div class="stats-grid">
-            <article class="stat-card">
-                <h3>Estado del acceso</h3>
-                <strong>Activo</strong>
-                <p>Sesión iniciada correctamente en la plataforma.</p>
-            </article>
-
-            <article class="stat-card">
-                <h3>Productos visibles</h3>
-                <strong>{{ productos|default([])|length }}</strong>
-                <p>Total de productos disponibles en el listado actual.</p>
-            </article>
-
-            <article class="stat-card">
-                <h3>Módulo actual</h3>
-                <strong>Dashboard</strong>
-                <p>Centro de navegación y control del sistema.</p>
-            </article>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Usuarios</h5>
+                    <p class="card-text">
+                        Consulta los usuarios registrados dentro del sistema y mantén un mejor
+                        control del acceso a la plataforma.
+                    </p>
+                    <a href="{{ url_for('usuarios') }}" class="btn btn-primary">Ver usuarios</a>
+                </div>
+            </div>
         </div>
 
-        <div class="quick-grid">
-            <a href="{{ url_for('productos') }}" class="quick-card">
-                <h3>Productos</h3>
-                <p>Consulta el catálogo y visualiza los registros existentes.</p>
-            </a>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Respaldos</h5>
+                    <p class="card-text">
+                        Accede a los respaldos de información generados por el sistema en diferentes
+                        formatos para una mejor seguridad y control de datos.
+                    </p>
+                    <a href="{{ url_for('datos') }}" class="btn btn-secondary">Ver datos</a>
+                </div>
+            </div>
+        </div>
 
-            <a href="{{ url_for('nuevo_producto') }}" class="quick-card">
-                <h3>Nuevo producto</h3>
-                <p>Agrega un nuevo elemento al catálogo de DeliverPuyo.</p>
-            </a>
-
-            <a href="{{ url_for('nosotros') }}" class="quick-card">
-                <h3>Proyecto</h3>
-                <p>Revisa el propósito, alcance y enfoque técnico del sistema.</p>
-            </a>
-
-            <a href="{{ url_for('index') }}" class="quick-card">
-                <h3>Inicio</h3>
-                <p>Regresa a la página principal y revisa la presentación general.</p>
-            </a>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Reporte PDF</h5>
+                    <p class="card-text">
+                        Genera y descarga un reporte en PDF con la información de productos
+                        registrada en DeliverPuyo.
+                    </p>
+                    <a href="{{ url_for('reporte_productos_pdf') }}" class="btn btn-danger">Descargar PDF</a>
+                </div>
+            </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

@@ -2,5 +2,5 @@ Flask
 Flask-Login
 Flask-SQLAlchemy
 mysql-connector-python
+fpdf2
 Werkzeug
-gunicorn

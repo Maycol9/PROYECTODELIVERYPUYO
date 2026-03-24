@@ -1,53 +1,119 @@
 {% extends 'base.html' %}
 
-{% block title %}Datos | DeliverPuyo{% endblock %}
+{% block title %}Respaldos | DeliverPuyo{% endblock %}
 
 {% block content %}
-<section class="page-section">
-    <div class="container">
-        <div class="page-header">
-            <span class="section-kicker">REGISTROS DEL SISTEMA</span>
-            <h1>Consulta de datos</h1>
-            <p>
-                Esta sección permite visualizar registros almacenados dentro del proyecto.
-            </p>
-        </div>
+<div class="mb-4">
+    <h2 class="mb-2">Centro de respaldos</h2>
+    <p class="text-muted">
+        Consulta la información respaldada de DeliverPuyo en distintos formatos,
+        permitiendo una mejor verificación, control y disponibilidad de los datos del sistema.
+    </p>
+</div>
 
-        {% if registros is defined %}
-            {% set lista_datos = registros %}
-        {% elif datos is defined %}
-            {% set lista_datos = datos %}
-        {% else %}
-            {% set lista_datos = [] %}
-        {% endif %}
-
-        {% if lista_datos %}
-        <div class="table-box">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Nombre</th>
-                        <th>Detalle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in lista_datos %}
-                    <tr>
-                        <td>{{ item.id or loop.index }}</td>
-                        <td>{{ item.nombre or item.titulo or item.categoria or 'Registro' }}</td>
-                        <td>{{ item.descripcion or item.detalle or item.valor or 'Sin detalle disponible' }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Respaldo en TXT</h4>
+                <div class="data-box">
+                    {% if datos_txt %}
+                        {% for linea in datos_txt %}
+                            <div>{{ linea }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div>No hay información disponible en este respaldo.</div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% else %}
-        <div class="empty-state">
-            <h3>No existen datos para mostrar</h3>
-            <p>Cuando el sistema cargue registros, aparecerán aquí de forma organizada.</p>
-        </div>
-        {% endif %}
     </div>
-</section>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Respaldo en JSON</h4>
+                <div class="data-box">
+                    {% if datos_json %}
+                        <pre>{{ datos_json | tojson(indent=4) }}</pre>
+                    {% else %}
+                        <div>No hay información disponible en este respaldo.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Respaldo en CSV</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fila in datos_csv %}
+                            <tr>
+                                <td>{{ fila.id_producto }}</td>
+                                <td>{{ fila.nombre }}</td>
+                                <td>{{ fila.categoria }}</td>
+                                <td>{{ fila.precio }}</td>
+                                <td>{{ fila.stock }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No hay información disponible en este respaldo.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Respaldo en SQLite</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for producto in datos_sqlite %}
+                            <tr>
+                                <td>{{ producto.id_producto }}</td>
+                                <td>{{ producto.nombre }}</td>
+                                <td>{{ producto.categoria }}</td>
+                                <td>{{ producto.precio }}</td>
+                                <td>{{ producto.stock }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No hay información disponible en este respaldo.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

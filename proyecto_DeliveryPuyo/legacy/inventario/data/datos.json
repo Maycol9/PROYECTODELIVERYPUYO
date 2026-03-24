@@ -1,0 +1,9 @@
+[
+    {
+        "id_producto": 2,
+        "nombre": "HAMBURGUESA",
+        "categoria": "comida",
+        "precio": 3.0,
+        "stock": 2
+    }
+]
