@@ -7,5 +7,5 @@ def get_connection():
         user="root",
         password="",
         database="deliverpuyo",
-        port=3307
+        port=3306
     )
