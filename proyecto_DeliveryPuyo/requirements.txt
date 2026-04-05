@@ -1,6 +1,8 @@
-Flask
-Flask-Login
-Flask-SQLAlchemy
-mysql-connector-python
-fpdf2
-Werkzeug
+Flask==3.1.0
+Flask-Login==0.6.3
+Flask-SQLAlchemy==3.1.1
+mysql-connector-python==9.2.0
+gunicorn==23.0.0
+python-dotenv==1.0.1
+fpdf==1.7.2
+Werkzeug==3.1.3

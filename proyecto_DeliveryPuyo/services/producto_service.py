@@ -1,89 +1,42 @@
-from conexion.conexion import get_connection
+from database import db
 from models.producto import Producto
 
 
 def obtener_productos():
-    conexion = get_connection()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM productos ORDER BY id_producto DESC")
-    productos = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
-    return productos
+    return Producto.query.order_by(Producto.id_producto.desc()).all()
 
 
 def obtener_producto_por_id(id_producto):
-    conexion = get_connection()
-    cursor = conexion.cursor(dictionary=True)
+    return db.session.get(Producto, id_producto)
 
-    cursor.execute(
-        "SELECT * FROM productos WHERE id_producto = %s",
-        (id_producto,)
-    )
-    producto = cursor.fetchone()
 
-    cursor.close()
-    conexion.close()
+def insertar_producto(producto):
+    db.session.add(producto)
+    db.session.commit()
     return producto
 
 
-def insertar_producto(producto: Producto):
-    conexion = get_connection()
-    cursor = conexion.cursor()
+def actualizar_producto(producto):
+    producto_db = db.session.get(Producto, producto.id_producto)
 
-    sql = """
-        INSERT INTO productos (nombre, categoria, precio, stock)
-        VALUES (%s, %s, %s, %s)
-    """
-    valores = (
-        producto.nombre,
-        producto.categoria,
-        producto.precio,
-        producto.stock
-    )
+    if not producto_db:
+        return None
 
-    cursor.execute(sql, valores)
-    conexion.commit()
+    producto_db.nombre = producto.nombre
+    producto_db.categoria = producto.categoria
+    producto_db.precio = producto.precio
+    producto_db.stock = producto.stock
 
-    cursor.close()
-    conexion.close()
-
-
-def actualizar_producto(producto: Producto):
-    conexion = get_connection()
-    cursor = conexion.cursor()
-
-    sql = """
-        UPDATE productos
-        SET nombre = %s, categoria = %s, precio = %s, stock = %s
-        WHERE id_producto = %s
-    """
-    valores = (
-        producto.nombre,
-        producto.categoria,
-        producto.precio,
-        producto.stock,
-        producto.id_producto
-    )
-
-    cursor.execute(sql, valores)
-    conexion.commit()
-
-    cursor.close()
-    conexion.close()
+    db.session.commit()
+    return producto_db
 
 
 def eliminar_producto(id_producto):
-    conexion = get_connection()
-    cursor = conexion.cursor()
+    producto_db = db.session.get(Producto, id_producto)
 
-    cursor.execute(
-        "DELETE FROM productos WHERE id_producto = %s",
-        (id_producto,)
-    )
-    conexion.commit()
+    if not producto_db:
+        return False
 
-    cursor.close()
-    conexion.close()
+    db.session.delete(producto_db)
+    db.session.commit()
+    return True

@@ -1,9 +1,9 @@
 class RegistroForm:
     def __init__(self, form_data):
-        self.nombre = form_data.get("nombre", "").strip()
-        self.email = form_data.get("email", "").strip()
-        self.password = form_data.get("password", "").strip()
-        self.confirmar_password = form_data.get("confirmar_password", "").strip()
+        self.nombre = (form_data.get("nombre", "") or "").strip()
+        self.email = (form_data.get("email", "") or "").strip().lower()
+        self.password = (form_data.get("password", "") or "").strip()
+        self.confirmar_password = (form_data.get("confirmar_password", "") or "").strip()
         self.errores = []
 
     def validar(self):
@@ -11,18 +11,14 @@ class RegistroForm:
 
         if not self.nombre:
             self.errores.append("El nombre es obligatorio.")
-
         if not self.email:
-            self.errores.append("El correo es obligatorio.")
-        elif "@" not in self.email or "." not in self.email:
-            self.errores.append("El correo no tiene un formato válido.")
-
+            self.errores.append("El correo electrónico es obligatorio.")
         if not self.password:
             self.errores.append("La contraseña es obligatoria.")
-        elif len(self.password) < 6:
+        if len(self.password) < 6:
             self.errores.append("La contraseña debe tener al menos 6 caracteres.")
 
-        if self.password != self.confirmar_password:
-            self.errores.append("Las contraseñas no coinciden.")
+        if self.confirmar_password and self.password != self.confirmar_password:
+            self.errores.append("La confirmación de contraseña no coincide.")
 
         return len(self.errores) == 0

@@ -1,20 +1,40 @@
 import csv
 import json
-from decimal import Decimal
+import sqlite3
 from pathlib import Path
 
-from database import db, ProductoSQLite
-
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "respaldos"
+RESPALDOS_DIR = BASE_DIR / "respaldos"
+TXT_FILE = RESPALDOS_DIR / "productos.txt"
+JSON_FILE = RESPALDOS_DIR / "productos.json"
+CSV_FILE = RESPALDOS_DIR / "productos.csv"
+SQLITE_FILE = RESPALDOS_DIR / "productos_respaldo.db"
 
-TXT_FILE = DATA_DIR / "productos.txt"
-JSON_FILE = DATA_DIR / "productos.json"
-CSV_FILE = DATA_DIR / "productos.csv"
+
+def _producto_a_dict(producto):
+    if isinstance(producto, dict):
+        return {
+            "id_producto": producto.get("id_producto"),
+            "nombre": producto.get("nombre"),
+            "categoria": producto.get("categoria"),
+            "precio": float(producto.get("precio", 0)),
+            "stock": int(producto.get("stock", 0))
+        }
+
+    if hasattr(producto, "to_dict"):
+        return producto.to_dict()
+
+    return {
+        "id_producto": getattr(producto, "id_producto", None),
+        "nombre": getattr(producto, "nombre", ""),
+        "categoria": getattr(producto, "categoria", ""),
+        "precio": float(getattr(producto, "precio", 0)),
+        "stock": int(getattr(producto, "stock", 0))
+    }
 
 
 def init_local_files():
-    DATA_DIR.mkdir(exist_ok=True)
+    RESPALDOS_DIR.mkdir(parents=True, exist_ok=True)
 
     if not TXT_FILE.exists():
         TXT_FILE.write_text("", encoding="utf-8")
@@ -23,98 +43,101 @@ def init_local_files():
         JSON_FILE.write_text("[]", encoding="utf-8")
 
     if not CSV_FILE.exists():
-        with CSV_FILE.open("w", newline="", encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow(["id_producto", "nombre", "categoria", "precio", "stock"])
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(
+                f,
+                fieldnames=["id_producto", "nombre", "categoria", "precio", "stock"]
+            )
+            writer.writeheader()
 
-
-def normalizar_producto(producto):
-    return {
-        "id_producto": int(producto["id_producto"]),
-        "nombre": str(producto["nombre"]),
-        "categoria": str(producto["categoria"]),
-        "precio": float(producto["precio"]) if isinstance(producto["precio"], Decimal) else float(producto["precio"]),
-        "stock": int(producto["stock"])
-    }
-
-
-def sincronizar_persistencia(productos_mysql):
-    init_local_files()
-
-    productos_normalizados = [normalizar_producto(p) for p in productos_mysql]
-
-    # TXT
-    with TXT_FILE.open("w", encoding="utf-8") as file:
-        if productos_normalizados:
-            for producto in productos_normalizados:
-                file.write(
-                    f"ID: {producto['id_producto']} | "
-                    f"Nombre: {producto['nombre']} | "
-                    f"Categoría: {producto['categoria']} | "
-                    f"Precio: {producto['precio']} | "
-                    f"Stock: {producto['stock']}\n"
-                )
-        else:
-            file.write("No existen productos registrados.\n")
-
-    # JSON
-    with JSON_FILE.open("w", encoding="utf-8") as file:
-        json.dump(productos_normalizados, file, ensure_ascii=False, indent=4)
-
-    # CSV
-    with CSV_FILE.open("w", newline="", encoding="utf-8") as file:
-        writer = csv.writer(file)
-        writer.writerow(["id_producto", "nombre", "categoria", "precio", "stock"])
-
-        for producto in productos_normalizados:
-            writer.writerow([
-                producto["id_producto"],
-                producto["nombre"],
-                producto["categoria"],
-                producto["precio"],
-                producto["stock"]
-            ])
-
-    # SQLite
-    ProductoSQLite.query.delete()
-
-    for producto in productos_normalizados:
-        producto_sqlite = ProductoSQLite(
-            id_producto=producto["id_producto"],
-            nombre=producto["nombre"],
-            categoria=producto["categoria"],
-            precio=producto["precio"],
-            stock=producto["stock"]
+    conn = sqlite3.connect(SQLITE_FILE)
+    cur = conn.cursor()
+    cur.execute(
+        '''
+        CREATE TABLE IF NOT EXISTS productos (
+            id_producto INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            precio REAL NOT NULL,
+            stock INTEGER NOT NULL
         )
-        db.session.add(producto_sqlite)
+        '''
+    )
+    conn.commit()
+    conn.close()
 
-    db.session.commit()
+
+def sincronizar_persistencia(productos):
+    init_local_files()
+    productos_list = [_producto_a_dict(p) for p in productos]
+
+    lineas = []
+    for p in productos_list:
+        lineas.append(
+            f"ID: {p['id_producto']} | Nombre: {p['nombre']} | "
+            f"Categoría: {p['categoria']} | Precio: {p['precio']} | Stock: {p['stock']}"
+        )
+
+    TXT_FILE.write_text("\n".join(lineas), encoding="utf-8")
+    JSON_FILE.write_text(json.dumps(productos_list, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(
+            f,
+            fieldnames=["id_producto", "nombre", "categoria", "precio", "stock"]
+        )
+        writer.writeheader()
+        writer.writerows(productos_list)
+
+    conn = sqlite3.connect(SQLITE_FILE)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM productos")
+    cur.executemany(
+        '''
+        INSERT INTO productos (id_producto, nombre, categoria, precio, stock)
+        VALUES (?, ?, ?, ?, ?)
+        ''',
+        [
+            (
+                p["id_producto"],
+                p["nombre"],
+                p["categoria"],
+                p["precio"],
+                p["stock"]
+            )
+            for p in productos_list
+        ]
+    )
+    conn.commit()
+    conn.close()
 
 
 def leer_txt():
     init_local_files()
-    contenido = TXT_FILE.read_text(encoding="utf-8").strip()
-    return contenido.splitlines() if contenido else []
+    return TXT_FILE.read_text(encoding="utf-8")
 
 
 def leer_json():
     init_local_files()
-    with JSON_FILE.open("r", encoding="utf-8") as file:
-        return json.load(file)
+    try:
+        data = json.loads(JSON_FILE.read_text(encoding="utf-8"))
+        return json.dumps(data, ensure_ascii=False, indent=2)
+    except Exception:
+        return "[]"
 
 
 def leer_csv():
     init_local_files()
-    datos = []
-
-    with CSV_FILE.open("r", newline="", encoding="utf-8") as file:
-        reader = csv.DictReader(file)
-        for fila in reader:
-            datos.append(fila)
-
-    return datos
+    with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
 
 
 def leer_sqlite():
-    productos = ProductoSQLite.query.order_by(ProductoSQLite.id_producto.desc()).all()
-    return [producto.to_dict() for producto in productos]
+    init_local_files()
+    conn = sqlite3.connect(SQLITE_FILE)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("SELECT id_producto, nombre, categoria, precio, stock FROM productos ORDER BY id_producto DESC")
+    rows = [dict(row) for row in cur.fetchall()]
+    conn.close()
+    return rows

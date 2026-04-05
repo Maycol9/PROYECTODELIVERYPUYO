@@ -1,3 +1,4 @@
+import os
 from fpdf import FPDF
 
 
@@ -5,21 +6,25 @@ def texto_seguro(valor):
     return str(valor).encode("latin-1", "replace").decode("latin-1")
 
 
+def _valor(producto, campo, default=""):
+    if isinstance(producto, dict):
+        return producto.get(campo, default)
+    return getattr(producto, campo, default)
+
+
 def generar_pdf_productos(productos, ruta_archivo):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    # Título principal
     pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(190, 10, "Reporte de Productos - DeliverPuyo", 0, 1, "C")
+    pdf.cell(190, 10, texto_seguro("Reporte de Productos - DeliverPuyo"), 0, 1, "C")
 
-    # Subtítulo
     pdf.set_font("Helvetica", "", 10)
     pdf.cell(
         190,
         8,
-        texto_seguro("Resumen del catálogo de productos registrados en la plataforma DeliverPuyo."),
+        texto_seguro("Resumen del catálogo de productos registrados en la plataforma."),
         0,
         1,
         "C"
@@ -27,46 +32,24 @@ def generar_pdf_productos(productos, ruta_archivo):
 
     pdf.ln(5)
 
-    # Encabezados de tabla
     pdf.set_font("Helvetica", "B", 10)
-    pdf.cell(15, 10, "ID", 1, 0, "C")
-    pdf.cell(60, 10, "Nombre", 1, 0, "C")
-    pdf.cell(40, 10, "Categoria", 1, 0, "C")
-    pdf.cell(35, 10, "Precio", 1, 0, "C")
-    pdf.cell(25, 10, "Stock", 1, 1, "C")
+    pdf.cell(15, 8, "ID", 1, 0, "C")
+    pdf.cell(60, 8, texto_seguro("Nombre"), 1, 0, "C")
+    pdf.cell(45, 8, texto_seguro("Categoría"), 1, 0, "C")
+    pdf.cell(30, 8, texto_seguro("Precio"), 1, 0, "C")
+    pdf.cell(25, 8, "Stock", 1, 1, "C")
 
-    # Contenido
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Helvetica", "", 9)
 
-    if productos:
-        for producto in productos:
-            pdf.cell(15, 10, texto_seguro(producto["id_producto"]), 1)
-            pdf.cell(60, 10, texto_seguro(producto["nombre"])[:30], 1)
-            pdf.cell(40, 10, texto_seguro(producto["categoria"])[:20], 1)
-            pdf.cell(35, 10, f"${float(producto['precio']):.2f}", 1)
-            pdf.cell(25, 10, texto_seguro(producto["stock"]), 1)
-            pdf.ln()
+    if not productos:
+        pdf.cell(175, 8, texto_seguro("No existen productos registrados."), 1, 1, "C")
     else:
-        pdf.cell(
-            175,
-            10,
-            texto_seguro("No existen productos registrados en DeliverPuyo."),
-            1,
-            1,
-            "C"
-        )
+        for producto in productos:
+            pdf.cell(15, 8, texto_seguro(_valor(producto, "id_producto", "")), 1, 0, "C")
+            pdf.cell(60, 8, texto_seguro(_valor(producto, "nombre", ""))[:30], 1, 0, "L")
+            pdf.cell(45, 8, texto_seguro(_valor(producto, "categoria", ""))[:22], 1, 0, "L")
+            pdf.cell(30, 8, texto_seguro(f"$ {_valor(producto, 'precio', 0)}"), 1, 0, "R")
+            pdf.cell(25, 8, texto_seguro(_valor(producto, "stock", 0)), 1, 1, "C")
 
-    pdf.ln(8)
-
-    # Pie informativo
-    pdf.set_font("Helvetica", "I", 9)
-    pdf.multi_cell(
-        0,
-        6,
-        texto_seguro(
-            "Documento generado automáticamente por DeliverPuyo para control y consulta "
-            "del catálogo de productos del sistema."
-        )
-    )
-
+    os.makedirs(os.path.dirname(ruta_archivo), exist_ok=True)
     pdf.output(ruta_archivo)

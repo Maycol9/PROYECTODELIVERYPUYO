@@ -1,22 +1,36 @@
+import os
+from urllib.parse import quote_plus
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
-class ProductoSQLite(db.Model):
-    __tablename__ = "productos_respaldo"
+def _normalize_uri(uri: str) -> str:
+    if uri.startswith("mysql://"):
+        return uri.replace("mysql://", "mysql+mysqlconnector://", 1)
+    return uri
 
-    id_producto = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(120), nullable=False)
-    categoria = db.Column(db.String(100), nullable=False)
-    precio = db.Column(db.Float, nullable=False)
-    stock = db.Column(db.Integer, nullable=False, default=0)
 
-    def to_dict(self):
-        return {
-            "id_producto": self.id_producto,
-            "nombre": self.nombre,
-            "categoria": self.categoria,
-            "precio": self.precio,
-            "stock": self.stock
-        }
+def get_database_uri() -> str:
+    direct_uri = (
+        os.getenv("DATABASE_URL")
+        or os.getenv("SQLALCHEMY_DATABASE_URI")
+        or os.getenv("MYSQL_URL")
+    )
+
+    if direct_uri:
+        return _normalize_uri(direct_uri)
+
+    host = os.getenv("DB_HOST") or os.getenv("MYSQLHOST")
+    port = os.getenv("DB_PORT") or os.getenv("MYSQLPORT")
+    user = os.getenv("DB_USER") or os.getenv("MYSQLUSER")
+    password = os.getenv("DB_PASSWORD") or os.getenv("MYSQLPASSWORD")
+    database = os.getenv("DB_NAME") or os.getenv("MYSQLDATABASE")
+
+    if host and user and database:
+        password = quote_plus(password or "")
+        port = port or "3306"
+        return f"mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}"
+
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    return f"sqlite:///{os.path.join(base_dir, 'delivery_puyo.db')}"
