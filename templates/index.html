@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeliverPuyo</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f4f6f9;
+            margin:0;
+            padding:0;
+        }
+        .contenedor{
+            max-width:900px;
+            margin:60px auto;
+            background:#fff;
+            padding:40px;
+            border-radius:14px;
+            box-shadow:0 4px 14px rgba(0,0,0,0.1);
+            text-align:center;
+        }
+        h1{
+            color:#1f3c88;
+        }
+        p{
+            color:#444;
+            font-size:18px;
+        }
+        .botones{
+            margin-top:30px;
+        }
+        .botones a{
+            display:inline-block;
+            margin:10px;
+            padding:12px 24px;
+            text-decoration:none;
+            border-radius:10px;
+            color:white;
+            font-weight:bold;
+        }
+        .login{ background:#2563eb; }
+        .register{ background:#16a34a; }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Bienvenido a DeliverPuyo</h1>
+        <p>Sistema web de gestión de usuarios y productos.</p>
+
+        <div class="botones">
+            <a class="login" href="{{ url_for('login') }}">Iniciar sesión</a>
+            <a class="register" href="{{ url_for('register') }}">Registrarse</a>
+        </div>
+    </div>
+</body>
+</html>

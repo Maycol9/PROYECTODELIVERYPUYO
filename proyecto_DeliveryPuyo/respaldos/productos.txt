@@ -1,1 +1,4 @@
-ID: 2 | Nombre: HAMBURGUESA | Categoría: comida | Precio: 3.0 | Stock: 2
+ID: 4 | Nombre: COCACOLA | Categoría: BEBIDA | Precio: 2.0 | Stock: 40
+ID: 3 | Nombre: CHAULAFAN | Categoría: COMIDA | Precio: 15.0 | Stock: 12
+ID: 2 | Nombre: POLLO ASADO | Categoría: COMIDA | Precio: 10.0 | Stock: 7
+ID: 1 | Nombre: AMBURGUESA | Categoría: COMIDA | Precio: 7.0 | Stock: 5

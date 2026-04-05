@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DeliverPuyo</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background:#f5f7fb;
+            margin:0;
+            padding:0;
+        }
+        .contenedor{
+            max-width:900px;
+            margin:50px auto;
+            background:white;
+            padding:30px;
+            border-radius:12px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1{
+            color:#1f3c88;
+        }
+        .menu a{
+            display:inline-block;
+            margin:10px 10px 0 0;
+            padding:12px 18px;
+            background:#2563eb;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+        }
+        .menu a.logout{
+            background:#dc2626;
+        }
+        .mensaje{
+            padding:10px;
+            border-radius:8px;
+            margin-bottom:12px;
+            font-size:14px;
+        }
+        .danger{ background:#fee2e2; color:#991b1b; }
+        .success{ background:#dcfce7; color:#166534; }
+        .warning{ background:#fef3c7; color:#92400e; }
+        .info{ background:#dbeafe; color:#1e40af; }
+    </style>
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Panel principal de DeliverPuyo</h1>
+        <p>Bienvenido al sistema.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mensaje {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="menu">
+            <a href="{{ url_for('listar_productos') }}">Ver productos</a>
+            <a href="{{ url_for('usuarios') }}">Ver usuarios</a>
+            <a href="{{ url_for('datos') }}">Ver respaldos</a>
+            <a class="logout" href="{{ url_for('logout') }}">Cerrar sesión</a>
+        </div>
+    </div>
+</body>
+</html>

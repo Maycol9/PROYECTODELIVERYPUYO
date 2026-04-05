@@ -1,9 +1,30 @@
 [
-    {
-        "id_producto": 2,
-        "nombre": "HAMBURGUESA",
-        "categoria": "comida",
-        "precio": 3.0,
-        "stock": 2
-    }
+  {
+    "id_producto": 4,
+    "nombre": "COCACOLA",
+    "categoria": "BEBIDA",
+    "precio": 2.0,
+    "stock": 40
+  },
+  {
+    "id_producto": 3,
+    "nombre": "CHAULAFAN",
+    "categoria": "COMIDA",
+    "precio": 15.0,
+    "stock": 12
+  },
+  {
+    "id_producto": 2,
+    "nombre": "POLLO ASADO",
+    "categoria": "COMIDA",
+    "precio": 10.0,
+    "stock": 7
+  },
+  {
+    "id_producto": 1,
+    "nombre": "AMBURGUESA",
+    "categoria": "COMIDA",
+    "precio": 7.0,
+    "stock": 5
+  }
 ]
